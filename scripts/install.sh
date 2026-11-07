@@ -600,7 +600,8 @@ if [ "$APPLY" -eq 1 ]; then
     rm -f "$PREFIX/$JOURNAL"
 fi
 if [ "$APPLY" -eq 0 ]; then
-    echo 'dry-run only: pass --apply to write files; add --enable to start the user service'
+    # The hifimate command applies by leaving out --dry-run and says so itself.
+    echo "${HIFIMATE_DRY_RUN_HINT:-dry-run only: pass --apply to write files; add --enable to start the user service}"
 else
     echo "installed HiFiMate into $PREFIX"
 fi

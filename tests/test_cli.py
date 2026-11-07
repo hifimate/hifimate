@@ -25,10 +25,18 @@ def home(tmp_path, monkeypatch):
 
 def recorder():
     calls = []
-    def run(command):
+    def run(command, **_):
         calls.append(command)
         return 0
     return calls, run
+
+
+def test_a_dry_run_tells_the_scripts_to_say_leave_out_dry_run(home, tmp_path):
+    seen = []
+    assert cli.install(*parse(['install', '--dry-run', '--prefix', str(tmp_path / 'p')]),
+                       lambda command, env=None: seen.append((command, env)) or 0) == 0
+    command, env = seen[0]
+    assert '--apply' not in command and '去掉 --dry-run' in env['HIFIMATE_DRY_RUN_HINT']
 
 
 def test_install_applies_enables_and_remembers_without_secrets(home, tmp_path):
@@ -224,10 +232,10 @@ def test_bootstrap_without_root_points_to_sudo(tmp_path):
 def test_a_user_install_has_no_control_password_to_give(home, tmp_path, monkeypatch):
     # its control password is the user's own login password (PAM)
     with pytest.raises(SystemExit, match='登录密码'):
-        cli.install(*parse(['install', '--ctrl-password-file', str(tmp_path / 'pw')]), lambda c: 0)
+        cli.install(*parse(['install', '--ctrl-password-file', str(tmp_path / 'pw')]), lambda c, **_: 0)
     monkeypatch.setenv('HIFIMATE_CTRL_PASSWORD', 'long enough')
     with pytest.raises(SystemExit, match='登录密码'):
-        cli.install(*parse(['install']), lambda c: 0)
+        cli.install(*parse(['install']), lambda c, **_: 0)
 
 
 def test_a_checkout_is_staged_with_what_a_release_carries():

@@ -282,11 +282,17 @@ def install(args, rest, run=subprocess.call):
     if args.install_deps:
         command.append('--install-deps')
     with Tree() as root:
-        status = run(['sh', str(root / 'scripts/install.sh'), *command])
+        status = run(['sh', str(root / 'scripts/install.sh'), *command], env=dry_run_hint('安装'))
     if status == 0 and not args.dry_run:
         save(prefix, remembered(options), args.music_assistant, args.install_deps)
         print(f'HiFiMate {__version__} 已安装到 {prefix}；hifimate status 查看状态')
     return status
+
+
+def dry_run_hint(action):
+    """The scripts' environment: their dry-run hint names this command's way to apply
+    (leave out --dry-run), not their own --apply."""
+    return {**os.environ, 'HIFIMATE_DRY_RUN_HINT': f'只是演练，什么都没有改动；去掉 --dry-run 即可{action}'}
 
 
 def system_install(args, rest, run=subprocess.call, sysrun=subprocess.run, sys_=system):
@@ -422,7 +428,7 @@ def uninstall(args, rest, run=subprocess.call, sysrun=subprocess.run, sys_=syste
             raise SystemExit('hifimate: 没有找到用户 hifimate，系统安装不存在')
         with Tree(owner=sys_.USER) as root:
             command = ['sh', str(root / 'scripts/uninstall.sh'), '--prefix', str(sys_.PREFIX)]
-            status = run(sys_.as_user(command + ([] if args.dry_run else ['--apply']), user_id))
+            status = run(sys_.as_user(command + ([] if args.dry_run else ['--apply']), user_id), env=dry_run_hint('卸载'))
             if status or args.dry_run:
                 return status
             for script in ('realtime_permissions.py', 'bluetooth_speaker.py'):
@@ -445,7 +451,7 @@ def uninstall(args, rest, run=subprocess.call, sysrun=subprocess.run, sys_=syste
     prefix = Path(args.prefix).expanduser().absolute() if args.prefix else Path(saved.get('prefix') or default_prefix())
     with Tree() as root:
         command = ['sh', str(root / 'scripts/uninstall.sh'), '--prefix', str(prefix)]
-        status = run(command + ([] if args.dry_run else ['--apply']))
+        status = run(command + ([] if args.dry_run else ['--apply']), env=dry_run_hint('卸载'))
     if status == 0 and not args.dry_run:
         config_path().unlink(missing_ok=True)
         print(f'已卸载 {prefix}。命令本身用 pipx uninstall hifimate 删除。')

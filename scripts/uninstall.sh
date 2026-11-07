@@ -121,5 +121,5 @@ else
     echo '+ would remove empty Music Assistant provider directories'
 fi
 if [ "$APPLY" -eq 0 ]; then
-    echo 'dry-run only: pass --apply to remove files'
+    echo "${HIFIMATE_DRY_RUN_HINT:-dry-run only: pass --apply to remove files}"
 fi

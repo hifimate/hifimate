@@ -12,14 +12,27 @@ UNINSTALL = ROOT / "scripts" / "uninstall.sh"
 HOST_CHECK = ROOT / "scripts" / "host_stack.py"
 
 
-def run(script, prefix, *args):
+def run(script, prefix, *args, env=None):
     return subprocess.run(
         [str(script), "--prefix", str(prefix), *args],
         cwd=ROOT,
         text=True,
         capture_output=True,
         check=False,
+        env=env,
     )
+
+
+def test_a_dry_run_names_the_callers_way_to_apply(tmp_path):
+    import os
+    env = {k: v for k, v in os.environ.items() if k != "HIFIMATE_DRY_RUN_HINT"}
+    prefix = tmp_path / "p"
+    for script, own in ((INSTALL, "pass --apply to write files"), (UNINSTALL, "pass --apply to remove files")):
+        if script == UNINSTALL:
+            assert run(INSTALL, prefix, "--apply", env=env).returncode == 0   # something to remove
+        assert own in run(script, prefix, env=env).stdout               # run directly: its own --apply
+        told = run(script, prefix, env={**env, "HIFIMATE_DRY_RUN_HINT": "drop --dry-run"}).stdout
+        assert "drop --dry-run" in told and "--apply" not in told.splitlines()[-1]
 
 
 def test_install_uninstall_round_trip(tmp_path):
