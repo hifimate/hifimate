@@ -62,6 +62,8 @@ artifacts = ['hifimate/_commit.txt']
 'NOTICE.md' = 'hifimate/_dist/NOTICE.md'
 
 [tool.hatch.build.targets.sdist]
+# python -m build makes the wheel from the sdist, so the git-ignored commit file must be in both.
+artifacts = ['hifimate/_commit.txt']
 include = ['hifimate', 'scripts', 'bin', 'config', 'systemd', 'gui', 'music-assistant', 'docs', 'tests', 'packaging',
            '*.md', 'LICENSE', 'pyproject.toml']
 exclude = ['music-assistant/.env', 'music-assistant/data', '**/__pycache__']

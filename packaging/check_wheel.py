@@ -5,7 +5,8 @@ usage: check_wheel.py dist/hifimate-*.whl
 Every tracked file under the directories the installer reads (scripts, bin,
 config, systemd, gui, music-assistant, the docs) must be in the wheel under
 hifimate/_dist, the package under hifimate/, and nothing from tests or a
-local Music Assistant deployment (.env, data) may be.
+local Music Assistant deployment (.env, data) may be. The wheel must record
+the commit it was built from (hifimate/_commit.txt, written before building).
 """
 import subprocess
 import sys
@@ -28,7 +29,7 @@ def expected(tracked):
     return want
 
 
-def check(wheel, tracked):
+def check(wheel, tracked, commit=None):
     names = set(zipfile.ZipFile(wheel).namelist())
     missing = sorted(expected(tracked) - names)
     forbidden = sorted(n for n in names if any(f in n for f in FORBIDDEN) or n.endswith('/.env'))
@@ -36,12 +37,17 @@ def check(wheel, tracked):
     problems = [f'missing: {n}' for n in missing] + [f'must not ship: {n}' for n in forbidden]
     if not entry or b'hifimate = hifimate.cli:main' not in zipfile.ZipFile(wheel).read(entry[0]):
         problems.append('no hifimate console script')
+    if commit is not None:
+        recorded = zipfile.ZipFile(wheel).read('hifimate/_commit.txt').decode().strip() if 'hifimate/_commit.txt' in names else None
+        if recorded != commit:
+            problems.append(f'hifimate/_commit.txt is {recorded!r}, not the built commit {commit}')
     return problems
 
 
 def main():
     tracked = subprocess.run(['git', 'ls-files'], cwd=ROOT, capture_output=True, text=True, check=True).stdout.split()
-    problems = check(sys.argv[1], tracked)
+    commit = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
+    problems = check(sys.argv[1], tracked, commit)
     for line in problems:
         print(line, file=sys.stderr)
     print(f'{sys.argv[1]}: ' + ('ok' if not problems else f'{len(problems)} problems'))

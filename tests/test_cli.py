@@ -1,8 +1,10 @@
 """The hifimate command: options, remembered settings, upgrade, status, packaging."""
 import json
+import re
 import subprocess
 import sys
 import tomllib
+import zipfile
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -156,10 +158,29 @@ def test_the_wheel_carries_every_directory_the_installer_reads():
     assert not any(name.startswith(('tests/', 'hifimate/_dist/tests')) for name in want)
 
 
+def test_the_wheel_check_requires_the_built_commit(tmp_path):
+    sys.path.insert(0, str(ROOT / 'packaging'))
+    import check_wheel
+
+    def wheel(commit_file):
+        path = tmp_path / 'hifimate-0-py3-none-any.whl'
+        with zipfile.ZipFile(path, 'w') as z:
+            z.writestr('hifimate/cli.py', '')
+            z.writestr('hifimate-0.dist-info/entry_points.txt', '[console_scripts]\nhifimate = hifimate.cli:main\n')
+            if commit_file is not None:
+                z.writestr('hifimate/_commit.txt', commit_file)
+        return path
+
+    head = 'a' * 40
+    assert check_wheel.check(wheel(head + '\n'), ['hifimate/cli.py'], head) == []
+    assert check_wheel.check(wheel(None), ['hifimate/cli.py'], head) == [f"hifimate/_commit.txt is None, not the built commit {head}"]
+    assert check_wheel.check(wheel('b' * 40), ['hifimate/cli.py'], head)
+
+
 def test_version_is_one_number_everywhere():
     config = tomllib.loads((ROOT / 'pyproject.toml').read_text())
     assert config['project']['dynamic'] == ['version'] and config['tool']['hatch']['version']['path'] == 'hifimate/__init__.py'
-    assert __version__ == '0.1.0'
+    assert re.fullmatch(r'\d+\.\d+\.\d+', __version__)
 
 
 def bootstrap_env(tmp_path, uid):

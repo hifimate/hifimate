@@ -23,6 +23,7 @@ The installer is then at `https://github.com/hifimate/hifimate/releases/latest/d
 ## Locally
 
 ```sh
-git rev-parse HEAD > hifimate/_commit.txt && python3 -m pip wheel --no-deps -w dist . && rm hifimate/_commit.txt
+# as the release builds it: sdist first, then the wheel from the sdist (needs python3 -m pip install build)
+git rev-parse HEAD > hifimate/_commit.txt && python3 -m build && rm hifimate/_commit.txt
 python3 -B packaging/check_wheel.py dist/hifimate-*.whl
 ```
