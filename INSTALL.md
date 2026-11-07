@@ -491,6 +491,19 @@ python3 scripts/check-format-stack.py
 python3 scripts/check-format-stack.py --mpd
 ```
 
+#### README 截图
+
+README 里的截图（`assets/screenshots/`）来自一个演示服务：它运行真正的控制页和频谱服务，只是数据是虚构的——
+一首虚构的曲目、示例 EQ、用 HiFiMate 自己的拟合代码算出来的示例房间校正，频谱分析的是一段合成音乐。
+不会出声，不读本机的配置和曲目，密码是 `demo-pass`。界面改了以后重新生成：
+
+```sh
+python3 tools/screenshots/demo.py &        # http://127.0.0.1:5099/ctrl/；EQ 曲线要用已安装的 CamillaDSP（--camilladsp）
+PLAYWRIGHT_CORE=…/node_modules/playwright-core CHROMIUM=…/chrome node tools/screenshots/shoot.mjs
+```
+
+`shoot.mjs` 需要 playwright-core 和一个 Chromium，图片由 Chromium 自己缩放并编码成 WebP。
+
 ### 8.3 调试仲裁服务
 
 仲裁服务在 `/run/user/<UID>/hifimate/format.sock` 提供本地接口，只接受同一用户。系统安装时查看当前状态：

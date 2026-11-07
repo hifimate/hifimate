@@ -2,6 +2,16 @@
 
 把一台 Linux 小主机和一台 DAC 变成家里的高保真播放器：全家人的手机、电脑都能直接把音乐投过来，声音按原始采样率出声。
 
+![控制页：信号路径、正在播放、歌词和实时频谱](https://raw.githubusercontent.com/hifimate/hifimate/main/assets/screenshots/ctrl-desktop.webp)
+
+<p>
+  <img src="https://raw.githubusercontent.com/hifimate/hifimate/main/assets/screenshots/ctrl-phone.webp" width="32%" alt="手机上的总览：当前输入、采样率和信号路径">
+  <img src="https://raw.githubusercontent.com/hifimate/hifimate/main/assets/screenshots/spectrum-phone.webp" width="32%" alt="手机上的正在播放、歌词和频谱">
+  <img src="https://raw.githubusercontent.com/hifimate/hifimate/main/assets/screenshots/eq-phone.webp" width="32%" alt="手机上的 EQ 曲线">
+</p>
+
+<sub>截图用的是演示数据（曲目、歌词、EQ 和房间测量都是虚构的），由 <code>tools/screenshots/</code> 生成。</sub>
+
 ## 什么时候用 HiFiMate
 
 你有一套音箱（或耳放）和一台 USB DAC，还有一台闲置的电脑，比如迷你主机、旧笔记本、NUC。遇到下面这些情况，HiFiMate 就有用：
@@ -141,6 +151,8 @@ HiFiMate 使用的不是 Music Assistant 原版，而是 [neqq3](https://github.
 Music Assistant 页面右下角也有一个可拖动的频谱浮窗，显示正在播放的曲目和歌词；它可以显示 HiFiMate 的输出，
 也可以分析浏览器自己正在播放的声音。
 
+![全屏频谱：192 kHz 输出，1/24 倍频程](https://raw.githubusercontent.com/hifimate/hifimate/main/assets/screenshots/spectrum-desktop.webp)
+
 ### 房间校正
 
 需要一部 iPhone，约 4 分钟：
@@ -153,6 +165,11 @@ Music Assistant 页面右下角也有一个可拖动的频谱浮窗，显示正�
 5. 查看校正前后的预测曲线，点「应用」。之后可以在控制页的 DSP 卡片里随时开关。
 
 校正只处理 35–350 Hz 的房间共振，只削峰、不补谷。
+
+<p>
+  <img src="https://raw.githubusercontent.com/hifimate/hifimate/main/assets/screenshots/roomfit-phone.webp" width="40%" alt="房间校正结果：测量平均、校正后预测和目标曲线">
+  <img src="https://raw.githubusercontent.com/hifimate/hifimate/main/assets/screenshots/roomfit-versions-phone.webp" width="40%" alt="房间校正方案：保留最近几组，随时切换">
+</p>
 
 手机麦克风本身低频不平直，测量时会扣除所选机型的麦克风曲线。这些曲线来自 [Faber Acoustical](https://www.faberacoustical.com/)
 （SignalScope 的开发者）在博客上公开发表的消声室实测，数据权利归 Faber Acoustical 所有：
@@ -174,6 +191,8 @@ Music Assistant 页面右下角也有一个可拖动的频谱浮窗，显示正�
 - 曲线由主机上的 CamillaDSP 实际计算，左右声道分开显示，还能叠加房间校正和两者合计；提升超过预留余量、可能削波时会提醒。
 - 可以粘贴 REW、AutoEQ、Equalizer APO 导出的滤波器列表直接导入。
 - 点「应用」立即生效，不中断播放；「旁路对比」临时关掉 EQ 做 A/B 对比；每次应用前的内容保留为历史版本（最近 10 个），可以随时载入。
+
+![我的 EQ：CamillaDSP 实算的曲线，叠加房间校正，左右声道分开](https://raw.githubusercontent.com/hifimate/hifimate/main/assets/screenshots/eq-desktop.webp)
 
 FIR（Conv）、DiffEq 等列表编辑不了的类型，在页面的「文本」模式里写。EQ 保存在 `/opt/hifimate/config/dsp-filters.yml`，
 写法和 CamillaDSP 配置的 `filters`、`pipeline` 两段相同，也可以在主机上直接编辑，例如：

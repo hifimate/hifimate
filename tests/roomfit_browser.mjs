@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 const source = fs.readFileSync(new URL('../gui/roomfit.js', import.meta.url), 'utf8');
-const { encodeWav, processingIssues, nextStep, combinedVerdict, profileLabel, plotX, plotY, plotPath } = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
+const { encodeWav, processingIssues, nextStep, combinedVerdict, profileLabel, plotX, plotY, plotPath, plotSize } = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
 
 // Lossless 32-bit PCM mono WAV with the recorded rate.
 const wav = new DataView(encodeWav(new Float32Array([0, 0.5, -1, 1.5]), 48000));
@@ -29,6 +29,9 @@ assert.equal(combinedVerdict({}), null);
 assert.deepEqual(combinedVerdict({ L: { grade: 'good', reasons: [] }, R: { grade: 'warn', reasons: ['a'] } }), { grade: 'warn', reasons: ['a'] });
 assert.equal(combinedVerdict({ L: { grade: 'bad', reasons: ['x'] }, R: { grade: 'warn', reasons: ['x'] } }).reasons.length, 1);
 
+// Drawn at its real width: a wide page gets a wider (not a magnified) plot, a bounded height.
+assert.deepEqual(plotSize(358), { W: 358, H: 170 }); assert.deepEqual(plotSize(1046), { W: 1046, H: 280 });
+assert.deepEqual(plotSize(0), { W: 360, H: 170 }); assert.equal(plotSize(100).W, 280);
 assert.equal(plotX(20, 360), 0); assert.ok(Math.abs(plotX(20000, 360) - 360) < 1e-9);
 assert.equal(plotY(20, 200), 0); assert.equal(plotY(-20, 200), 200); assert.equal(plotY(-99, 200), 200);
 assert.ok(plotPath([20, 1000], [0, 0], 360, 200).startsWith('M0.0 100.0 L'));

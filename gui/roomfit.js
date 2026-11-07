@@ -68,8 +68,14 @@ async function api(path, options = {}) {
 }
 const post = (path, data) => api(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
 
-function plot(curves, { lo = F_MIN, hi = F_MAX, trusted = 0 } = {}) {
-  const W = 360, H = 180;
+/** The plot drawn at the width it is shown at (text and lines keep their size); taller up to a limit. */
+export function plotSize(width) {
+  const W = Math.max(280, Math.round(width) || 360);
+  return { W, H: Math.round(Math.min(280, Math.max(170, W * 0.42))) };
+}
+
+function plot(curves, { lo = F_MIN, hi = F_MAX, trusted = 0, width = 360 } = {}) {
+  const { W, H } = plotSize(width);
   let html = trusted > lo ? `<rect class="untrusted" x="0" y="0" width="${plotX(trusted, W, lo, hi).toFixed(1)}" height="${H}"/>` : '';
   for (const db of [-15, -10, -5, 0, 5, 10, 15]) html += `<line class="grid${db ? '' : ' zero'}" x1="0" x2="${W}" y1="${plotY(db, H)}" y2="${plotY(db, H)}"/>${db % 10 === 0 ? `<text x="2" y="${plotY(db, H) - 2}">${db > 0 ? '+' : ''}${db}</text>` : ''}`;
   for (const [f, label] of [[20, '20'], [50, '50'], [100, '100'], [200, '200'], [350, '350'], [500, '500'], [1000, '1k'], [2000, '2k'], [5000, '5k'], [10000, '10k']]) {
@@ -221,7 +227,7 @@ async function main() {
         <p class="sub">${esc(p.hint)}</p>
         ${roomMap(session, p.key)}
         ${measured ? verdictHTML(verdict) : ''}
-        ${curves.length ? plot(curves, { lo: 20, hi: 2000, trusted: last.L.trusted_from_hz }) + `<div class="legend"><span><i style="border-color:var(--l)"></i>左</span><span><i style="border-color:var(--r)"></i>右</span>${curves.length > 2 ? '<span><i style="border-color:var(--muted);border-top-style:dashed"></i>中心位置</span>' : ''}</div>` : ''}
+        ${curves.length ? plot(curves, { lo: 20, hi: 2000, trusted: last.L.trusted_from_hz, width: view.clientWidth }) + `<div class="legend"><span><i style="border-color:var(--l)"></i>左</span><span><i style="border-color:var(--r)"></i>右</span>${curves.length > 2 ? '<span><i style="border-color:var(--muted);border-top-style:dashed"></i>中心位置</span>' : ''}</div>` : ''}
         <div class="actions">${measured
           ? `<button id="redo">重录</button><button class="primary" id="accept"${verdict?.grade === 'bad' ? ' disabled' : ''}>接受</button>`
           : '<button class="primary" id="go">开始测量（约 35 秒）</button>'}</div>
@@ -245,7 +251,7 @@ async function main() {
       view.innerHTML = `<h2>计算完成 <small>${c.positions.length} 个位置平均</small></h2>
         <p class="sub">只削减房间造成的低频峰（35–350 Hz），不提升谷，不需要额外降低音量。</p>
         ${['L', 'R'].map(ch => `<h3 style="margin-top:12px;font-size:14px">${names[ch]}声道 · ${c.channels[ch].filters.length} 个滤波器</h3>
-          ${plot([{ cls: 'target', f, db: c.target }, { cls: `${ch} before`, f, db: c.channels[ch].before }, { cls: ch, f, db: c.channels[ch].after }], { lo: 20, hi: 1000 })}
+          ${plot([{ cls: 'target', f, db: c.target }, { cls: `${ch} before`, f, db: c.channels[ch].before }, { cls: ch, f, db: c.channels[ch].after }], { lo: 20, hi: 1000, width: view.clientWidth })}
           <div class="filters">${c.channels[ch].filters.map(x => `<span>·</span><b>${x.freq.toFixed(0)} Hz</b><span>${x.gain.toFixed(1)} dB</span><span>Q ${x.q.toFixed(1)}</span>`).join('') || '<span>无需校正</span>'}</div>`).join('')}
         <div class="legend"><span><i style="border-color:var(--muted);border-top-style:dashed"></i>目标</span><span><i style="border-color:var(--l);opacity:.4"></i>测量平均</span><span><i style="border-color:var(--l)"></i>校正后（预测）</span></div>
         <div class="actions"><button id="discard">放弃</button><button class="primary" id="apply">应用</button></div>`;
