@@ -21,8 +21,8 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
       - id: version
@@ -41,7 +41,7 @@ jobs:
           python -B packaging/check_wheel.py dist/*.whl
           sed 's/@VERSION@/${{ steps.version.outputs.version }}/' packaging/install.sh > dist/install.sh
           sh -n dist/install.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release
           path: dist/
@@ -54,7 +54,7 @@ jobs:
     permissions:
       id-token: write          # PyPI Trusted Publishing, no token stored
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: release
           path: dist/
@@ -71,7 +71,7 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: release
           path: dist/
@@ -85,7 +85,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: release
           path: dist/

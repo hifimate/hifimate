@@ -18,13 +18,13 @@ jobs:
       matrix:
         python: ['3.11', '3.13']
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: '24'
       - name: Install test dependencies
         run: python -m pip install -e '.[test,host]'
       - name: Tests
@@ -34,8 +34,8 @@ jobs:
     name: package (wheel, pipx, bootstrap)
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
       - name: Build sdist and wheel
@@ -52,7 +52,7 @@ jobs:
           hifimate install --dry-run --without-music-assistant --no-install-deps --name CI --prefix "$RUNNER_TEMP/prefix" </dev/null
       - name: Bootstrap script
         run: sh -n packaging/install.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: dist
           path: dist/
