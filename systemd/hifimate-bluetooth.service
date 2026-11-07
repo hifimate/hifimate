@@ -1,0 +1,13 @@
+[Unit]
+Description=HiFiMate Bluetooth adapter names (BlueZ Alias with ownership journal)
+After=dbus.service
+[Service]
+Type=notify
+NotifyAccess=main
+TimeoutStartSec=50
+ExecStart=@PREFIX@/bin/hifimate-bluetooth run
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=30
+[Install]
+WantedBy=default.target

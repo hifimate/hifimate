@@ -1,0 +1,18 @@
+[Unit]
+Description=HiFiMate output spectrum (SSE and overlay assets)
+[Service]
+Type=simple
+RuntimeDirectory=hifimate-spectrum
+RuntimeDirectoryMode=0700
+ExecStart=@PREFIX@/bin/hifimate-spectrum
+Restart=on-failure
+RestartSec=3
+UMask=0077
+Nice=10
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%t/hifimate-spectrum
+[Install]
+WantedBy=default.target

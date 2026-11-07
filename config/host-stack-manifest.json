@@ -1,0 +1,183 @@
+{
+  "schema": 1,
+  "packages": {
+    "apt": [
+      "python3",
+      "pipewire",
+      "pipewire-pulse",
+      "wireplumber",
+      "bluez",
+      "libspa-0.2-bluetooth",
+      "mpd",
+      "shairport-sync",
+      "upmpdcli",
+      "pulseaudio-utils",
+      "python3-websocket",
+      "python3-dbus-next",
+      "pipewire-bin",
+      "python3-yaml",
+      "python3-numpy",
+      "util-linux",
+      "avahi-daemon",
+      "avahi-utils",
+      "iproute2"
+    ],
+    "dnf": [
+      "python3",
+      "pipewire",
+      "pipewire-pulseaudio",
+      "wireplumber",
+      "bluez",
+      "mpd",
+      "shairport-sync",
+      "upmpdcli",
+      "pulseaudio-utils",
+      "python3-websocket-client",
+      "python3-dbus-next",
+      "pipewire-utils",
+      "python3-pyyaml",
+      "python3-numpy",
+      "util-linux",
+      "avahi",
+      "avahi-tools",
+      "iproute"
+    ],
+    "pacman": [
+      "python",
+      "pipewire",
+      "pipewire-pulse",
+      "wireplumber",
+      "bluez",
+      "bluez-utils",
+      "mpd",
+      "shairport-sync",
+      "upmpdcli",
+      "libpulse",
+      "python-websocket-client",
+      "python-dbus-next",
+      "python-yaml",
+      "python-numpy",
+      "util-linux",
+      "avahi",
+      "iproute2"
+    ],
+    "zypper": [
+      "python3",
+      "pipewire",
+      "pipewire-pulseaudio",
+      "wireplumber",
+      "bluez",
+      "mpd",
+      "shairport-sync",
+      "upmpdcli",
+      "pulseaudio-utils",
+      "python3-websocket-client",
+      "python3-dbus_next",
+      "pipewire-tools",
+      "python3-PyYAML",
+      "python3-numpy",
+      "util-linux",
+      "avahi",
+      "avahi-utils",
+      "iproute2"
+    ]
+  },
+  "package_sources": {
+    "upmpdcli": {
+      "apt": "Debian: the upmpdcli repository, Ubuntu: ppa:jean-francois-dockes/upnpp1 — https://www.lesbonscomptes.com/upmpdcli/pages/downloads.html",
+      "dnf": "the upstream Fedora RPMs — https://www.lesbonscomptes.com/upmpdcli/pages/downloads.html"
+    }
+  },
+  "share_packages": {
+    "apt": [
+      "samba",
+      "avahi-daemon"
+    ],
+    "dnf": [
+      "samba",
+      "avahi"
+    ],
+    "pacman": [
+      "samba",
+      "avahi"
+    ],
+    "zypper": [
+      "samba",
+      "avahi"
+    ]
+  },
+  "minimum_versions": {
+    "wireplumber": "0.5",
+    "pipewire": "1.0"
+  },
+  "external_packages": [
+    "camilladsp 4.1.3, official PulseAudio build (fetched and pinned by the installer)",
+    "music-assistant (Docker Compose)"
+  ],
+  "executables": {
+    "python3": "python3",
+    "pipewire": "pipewire",
+    "pipewire-pulse": "pipewire-pulse",
+    "wireplumber": "wireplumber",
+    "bluez": "bluetoothctl",
+    "mpd": "mpd",
+    "shairport-sync": "shairport-sync",
+    "upmpdcli": "upmpdcli",
+    "camilladsp": "camilladsp",
+    "pactl": "pactl",
+    "pw-dump": "pw-dump",
+    "pw-metadata": "pw-metadata",
+    "pw-top": "pw-top",
+    "avahi-browse": "avahi-browse",
+    "iproute2": "ip",
+    "systemctl": "systemctl",
+    "journalctl": "journalctl",
+    "systemd-run": "systemd-run"
+  },
+  "units": [
+    "hifimate.service",
+    "hifimate-camilladsp.service",
+    "hifimate-bluetooth.service",
+    "hifimate-dlna.service",
+    "hifimate-airplay.service",
+    "hifimate-airplay-net.service",
+    "hifimate-mpd.service",
+    "hifimate-music-mpd.service",
+    "hifimate-spectrum.service",
+    "hifimate-ctrl.service"
+  ],
+  "compose_projects": {
+    "music-assistant": {
+      "file": "music-assistant/compose.yml",
+      "image": "ghcr.io/neqq3/ma-custom-loader-amd64:2.10.9",
+      "requires": [
+        "docker engine",
+        "docker compose v2 (up --wait)"
+      ],
+      "restart": "unless-stopped",
+      "web_port": 80,
+      "web_upstream_port": 8095,
+      "stream_port": 8097,
+      "mpd_port": 6601
+    }
+  },
+  "python_modules": [
+    "dbus_next",
+    "yaml",
+    "websocket",
+    "numpy"
+  ],
+  "realtime": {
+    "mode_default": "auto",
+    "managed_processes": [
+      "camilladsp",
+      "mpd",
+      "shairport-sync"
+    ],
+    "policy": "SCHED_RR",
+    "priority": 5,
+    "rttime_microseconds": 200000,
+    "permission_failure": "ordinary scheduling",
+    "pipewire": "native RTKit audio-thread policy; not overridden"
+  }
+}

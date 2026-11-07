@@ -1,0 +1,18 @@
+[Unit]
+Description=HiFiMate control page
+After=hifimate.service
+[Service]
+Type=simple
+ExecStart=@PREFIX@/bin/hifimate-ctrl
+Restart=on-failure
+RestartSec=3
+UMask=0077
+Nice=10
+# No sandboxing options: logging in checks this user's own Linux password
+# through PAM, which pam_unix does with its setgid helper unix_chkpwd.
+# NoNewPrivileges strips the setgid, and in a user unit PrivateTmp/ProtectSystem
+# put the service in its own user namespace where the shadow group is not
+# mapped; either way every password fails ("user unknown"). The service runs
+# as an unprivileged user without sudo rights, so they protected little.
+[Install]
+WantedBy=default.target

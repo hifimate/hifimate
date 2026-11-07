@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0a0c10">
+<title>HiFiMate 我的 EQ</title>
+<link rel="stylesheet" href="/ctrl/eq/eq.css">
+<script type="module" src="/ctrl/eq/eq.js"></script>
+</head>
+<body>
+<header><a class="brand" href="/ctrl/"><span class="logo"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M1 9V5M4 11V3M7 13V1M10 10V4M13 8V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>HiFiMate <small>我的 EQ</small></a>
+  <span class="spacer"></span><nav class="pages"><a href="/ctrl/">控制页</a><a href="/ctrl/eq/" class="on" aria-current="page">我的 EQ</a><a href="/ctrl/roomfit/">房间校正</a><a href="/ctrl/settings/">设置</a></nav></header>
+<main>
+  <section id="login" class="card" hidden>
+    <h2>登录后编辑</h2>
+    <p class="sub">不登录可以查看；修改 EQ 需要控制密码（主机上 hifimate 用户的密码）。</p>
+    <form id="login-form"><input id="password" type="password" autocomplete="current-password" placeholder="控制密码" required>
+      <button class="primary" type="submit">登录</button></form>
+    <p id="login-error" class="error"></p>
+  </section>
+
+  <section id="bypass-banner" class="card banner" hidden>
+    <b>正在旁路对比</b><span class="sub">现在听到的是没有个人 EQ 的声音。</span><span class="spacer"></span>
+    <button type="button" data-act="bypass">恢复 EQ</button>
+  </section>
+
+  <section class="card graph-card">
+    <div class="head">
+      <h2>频率响应 <span id="dirty" class="badge warn" hidden>未应用</span></h2>
+      <span class="spacer"></span>
+      <div class="seg" id="channel-seg"><button type="button" data-ch="LR" class="on">左右</button><button type="button" data-ch="L">左</button><button type="button" data-ch="R">右</button></div>
+    </div>
+    <div class="legend" id="legend"></div>
+    <div class="plot-wrap"><svg id="plot" viewBox="0 0 1000 340" role="img" aria-label="EQ 频率响应"></svg></div>
+    <p id="summary" class="sub"></p>
+    <p class="hint sub" id="hint">拖动圆点改频率和增益；滚轮或双指缩放改 Q；双击空白处添加峰值滤波器。</p>
+  </section>
+
+  <section class="card">
+    <div class="head">
+      <h2>滤波器 <span id="count" class="sub"></span></h2>
+      <span class="spacer"></span>
+      <div class="seg" id="mode-seg"><button type="button" data-mode="visual" class="on">列表</button><button type="button" data-mode="text">文本</button></div>
+    </div>
+    <div id="rows"></div>
+    <div id="text-mode" hidden>
+      <p class="sub">CamillaDSP 的 <code>filters</code> 和 <code>pipeline</code> 两段，与 <code>/opt/hifimate/config/dsp-filters.yml</code> 相同。FIR（Conv）、DiffEq 等在这里编辑。</p>
+      <textarea id="text" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+    </div>
+    <p id="error" class="error"></p>
+    <div class="actions">
+      <button type="button" data-act="add" class="need-login">+ 添加滤波器</button>
+      <button type="button" data-act="import" class="need-login">导入</button>
+      <button type="button" data-act="versions">版本</button>
+      <span class="spacer"></span>
+      <button type="button" data-act="bypass" id="bypass-button" class="need-login">旁路对比</button>
+      <button type="button" data-act="revert" class="need-login">还原</button>
+      <button type="button" data-act="apply" class="primary need-login">应用</button>
+    </div>
+  </section>
+</main>
+
+<dialog id="import-dialog" class="sheet">
+  <div class="sheet-head"><h2>导入滤波器</h2><button type="button" class="close" data-close aria-label="关闭">×</button></div>
+  <p class="sub">粘贴 REW、AutoEQ（ParametricEQ.txt）或 Equalizer APO 导出的内容，例如：<br><code>Filter 1: ON PK Fc 52 Hz Gain 2.9 dB Q 1.70</code></p>
+  <textarea id="import-text" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+  <p id="import-error" class="error"></p>
+  <div class="actions"><span class="spacer"></span>
+    <button type="button" data-import="replace">替换现有</button><button type="button" data-import="append" class="primary">追加</button></div>
+</dialog>
+
+<dialog id="versions-dialog" class="sheet">
+  <div class="sheet-head"><h2>历史版本 <small>保留最近 10 个</small></h2><button type="button" class="close" data-close aria-label="关闭">×</button></div>
+  <div id="versions-list"></div>
+  <p class="sub">每次「应用」前的内容会保存为一个版本。「载入」只放进编辑区，点「应用」才生效。</p>
+</dialog>
+
+<div id="toast" class="toast" hidden></div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+/* Now playing and the lyric row (nowplaying.js), for /ctrl and the spectrum panel in Music Assistant.
+   Its own palette: the host page's variables are not assumed. */
+.np,.lyric{--np-text:#e7eaf0;--np-muted:#8b93a5;--np-faint:#5b6374;--np-line:#1e2430;--np-line2:#262d3b;
+  --np-surface:#151922;--np-accent:#46d6a4;color:var(--np-text)}
+.np{padding:6px 6px 10px;border-bottom:1px solid var(--np-line);margin-bottom:4px;display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"src text ctl" "time time time" "hint hint hint";column-gap:12px;align-items:center}
+.np-src{grid-area:src}.np-text{grid-area:text}.np-ctl{grid-area:ctl}.np-time{grid-area:time}.np-hint{grid-area:hint}
+.np-src{flex:none;font-size:11px;font-weight:700;letter-spacing:.3px;padding:3px 7px;border-radius:6px;background:var(--np-surface)}
+.np-text{flex:1;min-width:0;display:flex;flex-direction:column}
+.np-text b{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.np-sub{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--np-faint);font-size:12px;font-weight:500}
+.np-ctl{flex:none;display:flex;align-items:center;gap:6px}
+.np-btn{width:34px;height:34px;padding:0;border-radius:50%;display:grid;place-items:center;cursor:pointer;
+  border:1px solid var(--np-line2);background:var(--np-surface);color:#cfd5e1;font:inherit}
+.np-btn:hover:enabled{border-color:#3a4356}
+.np-btn:disabled{opacity:.35;cursor:not-allowed}
+.np-btn svg{width:15px;height:15px}
+.np-btn.main{width:40px;height:40px;background:var(--np-accent);border-color:var(--np-accent);color:#062218}
+.np-btn.main svg{width:17px;height:17px}
+.np-time{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:11.5px;color:var(--np-muted)}
+.np-time span{flex:none;min-width:38px}.np-time span:last-child{text-align:right}
+.np-seek{flex:1;appearance:none;-webkit-appearance:none;height:4px;border-radius:2px;margin:0;
+  background:linear-gradient(to right,var(--np-accent) var(--fill,0%),var(--np-surface) var(--fill,0%))}
+.np-seek::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#e7eaf0}
+.np-seek::-moz-range-thumb{width:12px;height:12px;border:0;border-radius:50%;background:#e7eaf0}
+.np-seek:disabled{opacity:1}.np-seek:disabled::-webkit-slider-thumb{background:transparent}
+.np-seek:disabled::-moz-range-thumb{background:transparent}
+.np-hint{margin:6px 0 0;font-size:11px;color:var(--np-faint)}
+/* the lyric row: one line, the sung one; a translation follows, smaller */
+.lyric{height:30px;line-height:30px;margin:2px 0 2px;padding:0 8px;text-align:center;font-size:15px;font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lyric .tr{margin-left:12px;font-size:12.5px;font-weight:400;color:var(--np-muted)}
+/* word-timed: each word fills from muted to bright as it is sung */
+.lyric .w{--p:0%;background:linear-gradient(90deg,var(--np-text) var(--p),rgba(231,234,240,.38) var(--p));
+  -webkit-background-clip:text;background-clip:text;color:transparent;white-space:pre}
+.lyric .none{font-size:12px;font-weight:400;color:var(--np-faint)}

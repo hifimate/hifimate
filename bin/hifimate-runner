@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+HERE=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
+PREFIX=$(CDPATH= cd -- "$HERE/.." && pwd)
+export PYTHONPATH="$PREFIX/lib${PYTHONPATH:+:$PYTHONPATH}"
+exec python3 -B -m hifimate.daemon --config "$PREFIX/config/hifimate.conf"

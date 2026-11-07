@@ -1,0 +1,21 @@
+title: HiFi DSP
+devices:
+  samplerate: 48000
+  chunksize: 256
+  capture:
+    type: Pulse
+    device: hifimate_selected.monitor
+    channels: 2
+  playback:
+    type: Alsa
+    device: auto
+    channels: 2
+    format: S32_LE
+filters:
+  Headroom:
+    type: Gain
+    parameters: {gain: -6.0, inverted: false, mute: false}
+pipeline:
+  - type: Filter
+    channels: [0, 1]
+    names: [Headroom]

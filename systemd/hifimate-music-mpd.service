@@ -1,0 +1,12 @@
+[Unit]
+Description=HiFiMate Music Assistant MPD
+Requires=pipewire-pulse.service
+After=pipewire-pulse.service
+[Service]
+# MPD sends READY=1 once it listens, so upmpdcli/MA/HiFi never race its port.
+Type=notify
+ExecStart=@PREFIX@/bin/hifimate-rt @MPD@ --no-daemon @PREFIX@/config/host-stack/music-mpd.conf
+Restart=on-failure
+RestartSec=2
+[Install]
+WantedBy=default.target

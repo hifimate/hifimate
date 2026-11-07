@@ -1,0 +1,11 @@
+{
+  "bind": "127.0.0.1",
+  "port": 5008,
+  "camilla_url": "ws://127.0.0.1:1234",
+  "camilladsp": "@PREFIX@/bin/hifimate-camilladsp",
+  "workdir": "@RUNTIME@-spectrum",
+  "assets": "@PREFIX@/gui",
+  "fps": 30,
+  "frequencyScale": "log",
+  "channelLayout": "dual-combined"
+}

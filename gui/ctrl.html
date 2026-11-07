@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0a0c10">
+<title>HiFiMate Control</title>
+<link rel="stylesheet" href="/_hifimate/spectrum-overlay.css">
+<link rel="stylesheet" href="/ctrl/nowplaying.css">
+<link rel="stylesheet" href="/ctrl/ctrl.css">
+<script type="module" src="/ctrl/ctrl.js"></script>
+</head>
+<body data-view="overview">
+<header>
+  <a class="brand" href="#overview"><span class="logo"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M1 9V5M4 11V3M7 13V1M10 10V4M13 8V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>HiFiMate <small>Control</small></a>
+  <div id="now" class="now desktop"></div>
+  <span class="spacer"></span>
+  <span id="live" class="chip">连接中</span>
+  <span id="host" class="chip desktop"></span>
+  <a class="iconbtn" href="/ctrl/settings/" aria-label="设置" title="设置"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="2.6"/><path d="M10 2.5v2.2M10 15.3v2.2M2.5 10h2.2M15.3 10h2.2M4.7 4.7l1.6 1.6M13.7 13.7l1.6 1.6M4.7 15.3l1.6-1.6M13.7 6.3l1.6-1.6"/></svg></a>
+  <button id="login" class="iconbtn" type="button" aria-label="登录"></button>
+</header>
+
+<main>
+  <p id="hint" class="hint" role="status"></p>
+
+  <!-- 总览 -->
+  <section class="view" data-view="overview">
+    <div id="now-card" class="card now-card mobile"></div>
+    <section class="card path">
+      <div class="head"><h2>信号路径</h2><span class="spacer"></span>
+        <div class="legend desktop"><span><i class="l-on"></i>当前路线</span><span><i class="l-wait"></i>有数据 · 待命</span><span><i class="l-off"></i>无数据 / 未选</span></div></div>
+      <div id="flow" class="flow">
+        <svg id="links" aria-hidden="true"></svg>
+        <div class="col"><h3 class="mobile">输入 <span>点按切换</span></h3><div id="inputs" class="stack"></div></div>
+        <div id="arbiter" class="node arbiter desktop"></div>
+        <div id="dsp" class="node dsp"></div>
+        <div class="col"><h3 class="mobile">输出 <span>点按切换</span></h3><div id="outputs" class="stack"></div>
+          <p class="note desktop">插入新的 USB DAC 会自动出现在这里；HDMI 等无法确认映射的输出不列出。</p></div>
+      </div>
+    </section>
+    <div class="mobile">
+      <h3>服务 <span id="svc-sum-count"></span></h3><div id="svc-summary" class="card list"></div>
+      <h3>最近事件</h3><div id="recent" class="card list"></div>
+    </div>
+  </section>
+
+  <div class="columns">
+    <!-- 频谱 -->
+    <section class="view card spec" data-view="spectrum">
+      <div class="head"><h2>输出频谱 <span class="sub">DSP 输出 · 已交给 DAC 的 PCM</span></h2><span class="spacer"></span><span id="spec-rate" class="chip"></span></div>
+      <div id="now-playing" class="np"></div>
+      <div id="lyric" class="lyric"></div>
+      <div id="spectrum"></div>
+      <p class="sub mobile">显示的是已交给 DAC 的数字 PCM（主音量、滤波之后）；停止播放 350 ms 后归零。</p>
+    </section>
+
+    <!-- 服务 -->
+    <section class="view card pad" data-view="services">
+      <div class="head"><h2>服务 <span id="svc-count" class="sub"></span></h2></div>
+      <div id="services"></div>
+    </section>
+  </div>
+
+  <!-- 事件 / 日志 -->
+  <section class="view card pad logs" data-view="logs">
+    <div class="head"><h2>运行记录</h2><span class="spacer"></span>
+      <div class="tabs" role="tablist"><button type="button" data-tab="events" class="on">事件</button><button type="button" data-tab="logs">日志</button><button type="button" data-tab="errors">错误</button></div></div>
+    <div id="filters" class="filters" hidden>
+      <div id="units" class="pills"></div>
+      <input id="search" type="search" placeholder="搜索日志…" autocomplete="off">
+    </div>
+    <div id="events" class="events"></div>
+    <div id="journal" class="journal" hidden></div>
+  </section>
+
+  <footer id="kpis" class="card kpis desktop"></footer>
+</main>
+
+<nav class="tabbar mobile" aria-label="页面">
+  <a href="#overview" data-nav="overview"><svg viewBox="0 0 20 20"><path d="M3 10h4l2-5 2 10 2-5h4"/></svg>总览</a>
+  <a href="#services" data-nav="services"><svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="5" rx="1.5"/><rect x="3" y="12" width="14" height="5" rx="1.5"/></svg>服务</a>
+  <a href="#logs" data-nav="logs"><svg viewBox="0 0 20 20"><path d="M4 5h12M4 10h12M4 15h8"/></svg>日志</a>
+  <a href="#spectrum" data-nav="spectrum"><svg viewBox="0 0 20 20"><path d="M4 16v-4M8 16V6M12 16V9M16 16V4"/></svg>频谱</a>
+</nav>
+
+<dialog id="login-dialog"><form id="login-form" method="dialog">
+  <h2>登录 HiFiMate Control</h2><p class="sub">查看状态无需登录；切换、配对和服务操作需要控制密码（主机上 hifimate 用户的密码，也是音乐共享的密码）。</p>
+  <input id="password" type="password" autocomplete="current-password" required maxlength="1024" placeholder="控制密码">
+  <p id="login-error" class="error" role="alert"></p>
+  <div class="actions"><button type="button" data-close>取消</button><button type="submit" class="primary">登录</button></div>
+</form></dialog>
+
+<dialog id="confirm-dialog">
+  <h2 id="confirm-title">确认操作</h2><p id="confirm-text" class="sub"></p>
+  <div class="actions"><button type="button" data-close>取消</button><button type="button" id="confirm-ok" class="danger">确认</button></div>
+</dialog>
+
+<dialog id="sheet" class="sheet">
+  <div class="grab"></div>
+  <div class="sheet-head"><span id="sheet-dot" class="dot"></span><div><b id="sheet-title"></b><div id="sheet-state" class="sub"></div></div><span class="spacer"></span><button type="button" class="iconbtn" data-close aria-label="关闭">×</button></div>
+  <div id="sheet-logs" class="mini-log"></div>
+  <div id="sheet-actions" class="sheet-actions"></div>
+</dialog>
+
+<div id="toast" role="status" hidden></div>
+</body>
+</html>

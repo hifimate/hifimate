@@ -1,0 +1,49 @@
+{
+  "config_entries": {
+    "auth_method": {
+      "label": "Sign in",
+      "description": "Sign in with the Bilibili app to access your favorite folders and higher audio quality, or continue without an account (public content only).",
+      "options": {
+        "qr": "Scan a QR code with the Bilibili app",
+        "anonymous": "Continue without an account"
+      }
+    },
+    "audio_quality": {
+      "label": "Preferred audio quality",
+      "description": "Lossless (Hi-Res FLAC) needs a premium (大会员) account and is only available for some uploads; otherwise the best AAC stream is used.",
+      "options": {
+        "lossless": "Lossless (fallback to best AAC)",
+        "high": "Best AAC (up to 192kbps)",
+        "standard": "Standard AAC (132kbps)"
+      }
+    },
+    "music_zone_only": {
+      "label": "Search the music zone only",
+      "description": "Restrict video search to Bilibili's music zone for more relevant results."
+    },
+    "clean_titles": {
+      "label": "Clean up video titles",
+      "description": "Strip decorations like 【Hi-Res无损】 from video titles and use the song name between 《》 when present."
+    }
+  },
+  "setup_flow": {
+    "user": {
+      "title": "Connect Bilibili",
+      "description": "Choose how to connect. Signing in shows a QR code in the next step."
+    },
+    "scan_qr": {
+      "title": "Scan to sign in",
+      "description": "Scan the QR code with the Bilibili app and confirm the login. A fresh code is shown automatically if it expires.",
+      "progress_text": "Waiting for you to scan and confirm in the app..."
+    }
+  },
+  "media": {
+    "recommendations": {
+      "hot_songs": { "name": "Bilibili hot songs" },
+      "new_releases": { "name": "Bilibili new releases" }
+    }
+  },
+  "manifest": {
+    "description": "Stream the audio of Bilibili videos: search, uploaders, favorite folders and music charts."
+  }
+}

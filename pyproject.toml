@@ -1,0 +1,67 @@
+[build-system]
+requires = ['hatchling>=1.26']
+build-backend = 'hatchling.build'
+
+[project]
+name = 'hifimate'
+dynamic = ['version']
+description = 'HiFiMate: a Linux hi-fi audio receiver (AirPlay, DLNA, Bluetooth, Music Assistant) at the native sample rate'
+requires-python = '>=3.10'
+license = 'MIT'
+license-files = ['LICENSE', 'NOTICE.md']
+dependencies = []   # the installer needs nothing; the receiver uses distribution packages (host_stack.py)
+readme = 'README.md'
+keywords = ['audio', 'hifi', 'airplay', 'dlna', 'bluetooth', 'pipewire', 'camilladsp', 'music-assistant']
+classifiers = [
+    'Environment :: No Input/Output (Daemon)',
+    'Operating System :: POSIX :: Linux',
+    'Programming Language :: Python :: 3',
+    'Topic :: Multimedia :: Sound/Audio :: Players',
+]
+
+[project.urls]
+Homepage = 'https://github.com/hifimate/hifimate'
+Issues = 'https://github.com/hifimate/hifimate/issues'
+
+[project.scripts]
+hifimate = 'hifimate.cli:main'
+
+[project.optional-dependencies]
+test = ['pytest>=8']
+host = ['websocket-client>=1.7', 'PyYAML>=6', 'dbus-next>=0.2.3', 'numpy>=1.24']
+
+[tool.pytest.ini_options]
+testpaths = ['tests']
+# MA provider tests need Music Assistant itself: scripts/test_ma_providers.sh runs them in the MA image.
+norecursedirs = ['tests/providers']
+pythonpath = ['.']
+
+[tool.hatch.version]
+path = 'hifimate/__init__.py'
+
+# The wheel carries the whole installable tree: the hifimate package plus,
+# under hifimate/_dist, everything scripts/install.sh copies into a prefix.
+# hifimate.cli puts the two back together in a staging directory.
+[tool.hatch.build.targets.wheel]
+packages = ['hifimate']
+exclude = ['hifimate/_dist']
+# Written by the release workflow (git-ignored, so named explicitly).
+artifacts = ['hifimate/_commit.txt']
+
+[tool.hatch.build.targets.wheel.force-include]
+'scripts' = 'hifimate/_dist/scripts'
+'bin' = 'hifimate/_dist/bin'
+'config' = 'hifimate/_dist/config'
+'systemd' = 'hifimate/_dist/systemd'
+'gui' = 'hifimate/_dist/gui'
+'music-assistant' = 'hifimate/_dist/music-assistant'
+'README.md' = 'hifimate/_dist/README.md'
+'docs' = 'hifimate/_dist/docs'
+'INSTALL.md' = 'hifimate/_dist/INSTALL.md'
+'LICENSE' = 'hifimate/_dist/LICENSE'
+'NOTICE.md' = 'hifimate/_dist/NOTICE.md'
+
+[tool.hatch.build.targets.sdist]
+include = ['hifimate', 'scripts', 'bin', 'config', 'systemd', 'gui', 'music-assistant', 'docs', 'tests', 'packaging',
+           '*.md', 'LICENSE', 'pyproject.toml']
+exclude = ['music-assistant/.env', 'music-assistant/data', '**/__pycache__']

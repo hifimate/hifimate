@@ -1,0 +1,95 @@
+name: Release
+
+# Tag vX.Y.Z (matching hifimate/__init__.py) to publish to PyPI and make a
+# GitHub release with the one-line installer. Run it by hand first to publish
+# the same build to TestPyPI.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    uses: ./.github/workflows/ci.yml
+
+  build:
+    needs: checks
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - id: version
+        name: Version
+        run: |
+          version=$(sed -n 's/^__version__ = "\([^"]*\)".*/\1/p' hifimate/__init__.py)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [ "${GITHUB_REF_TYPE}" = tag ] && [ "${GITHUB_REF_NAME}" != "v$version" ]; then
+            echo "tag ${GITHUB_REF_NAME} does not match hifimate/__init__.py version $version" >&2; exit 1
+          fi
+      - name: Build
+        run: |
+          git rev-parse HEAD > hifimate/_commit.txt
+          python -m pip install build
+          python -m build
+          python -B packaging/check_wheel.py dist/*.whl
+          sed 's/@VERSION@/${{ steps.version.outputs.version }}/' packaging/install.sh > dist/install.sh
+          sh -n dist/install.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: dist/
+
+  testpypi:
+    if: github.event_name == 'workflow_dispatch'
+    needs: build
+    runs-on: ubuntu-24.04
+    environment: testpypi
+    permissions:
+      id-token: write          # PyPI Trusted Publishing, no token stored
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release
+          path: dist/
+      - run: rm dist/install.sh
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  pypi:
+    if: github.ref_type == 'tag'
+    needs: build
+    runs-on: ubuntu-24.04
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release
+          path: dist/
+      - run: rm dist/install.sh
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  github-release:
+    if: github.ref_type == 'tag'
+    needs: [build, pypi]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release
+          path: dist/
+      - name: GitHub release with the installer
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --title "HiFiMate ${{ needs.build.outputs.version }}" --generate-notes

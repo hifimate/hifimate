@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.venv/
+build/
+dist/
+*.egg-info/
+.coverage
+htmlcov/
+.DS_Store
+music-assistant/.env
+music-assistant/data/
+hifimate/_commit.txt
+*.swp
+*.swo
+*~

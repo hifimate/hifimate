@@ -1,0 +1,13 @@
+{
+  "type": "music",
+  "domain": "migu",
+  "stage": "beta",
+  "name": "Migu Music",
+  "description": "Stream the Migu Music (咪咕音乐) catalog through a local migu-api-enhanced service: search, albums, singers, playlists, charts and lyrics.",
+  "codeowners": [],
+  "credits": [
+    "[migu-api-enhanced](https://github.com/Domdkw/miguMusic-api-enhanced)"
+  ],
+  "requirements": [],
+  "multi_instance": true
+}

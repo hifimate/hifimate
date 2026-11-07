@@ -1,0 +1,10 @@
+[Unit]
+Description=HiFiMate AirPlay default-route follower
+After=hifimate-airplay.service
+[Service]
+Type=simple
+ExecStart=@PREFIX@/bin/hifimate-airplay-net watch %t/hifimate-airplay/shairport-sync.conf
+Restart=on-failure
+RestartSec=5
+[Install]
+WantedBy=default.target

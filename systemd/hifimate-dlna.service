@@ -1,0 +1,24 @@
+[Unit]
+Description=HiFiMate DLNA renderer (upmpdcli)
+Requires=pipewire-pulse.service
+# Soft dependencies: a failed or restarting MPD/arbitration start must not fail
+# this job ('dependency' results are never retried by Restart=). upmpdcli
+# reconnects to MPD itself; hooks reach hifimate.service by socket path each time.
+Wants=hifimate.service hifimate-mpd.service
+After=pipewire.service pipewire-pulse.service hifimate.service hifimate-mpd.service
+[Service]
+Type=simple
+ExecStart=@UPMPDCLI@ -c @PREFIX@/config/host-stack/upmpdcli.conf
+Restart=on-failure
+RestartSec=2
+# upmpdcli 1.9.17 loses a SIGTERM that arrives in its first ~0.45 s (before
+# its final pause(), main.cxx) and then never exits; a second SIGTERM stops it
+# in ~0.2 s. Any restart soon after a start hits this: the installer, the
+# pipewire-pulse Requires= restart, a restart from /ctrl. Resend SIGTERM each
+# second until the process is gone instead of waiting for SIGKILL.
+# $$MAINPID: the variable systemd sets for ExecStop, expanded by sh.
+ExecStop=/bin/sh -c 'for try in 1 2 3 4 5 6 7 8; do kill -TERM "$$MAINPID" 2>/dev/null || exit 0; for tick in 1 2 3 4 5 6 7 8 9 10; do kill -0 "$$MAINPID" 2>/dev/null || exit 0; sleep 0.1; done; done'
+# A clean stop takes ~0.4 s, so do not wait the default 90 s.
+TimeoutStopSec=10
+[Install]
+WantedBy=default.target

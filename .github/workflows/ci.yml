@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:          # the release runs the same checks first
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: tests (Python ${{ matrix.python }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install test dependencies
+        run: python -m pip install -e '.[test,host]'
+      - name: Tests
+        run: python -B -W error -m pytest -q
+
+  package:
+    name: package (wheel, pipx, bootstrap)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Build sdist and wheel
+        run: |
+          git rev-parse HEAD > hifimate/_commit.txt
+          python -m pip install build
+          python -m build
+      - name: Wheel contents
+        run: python -B packaging/check_wheel.py dist/*.whl
+      - name: Install with pipx and dry-run
+        run: |
+          pipx install dist/*.whl
+          hifimate --version
+          hifimate install --dry-run --without-music-assistant --no-install-deps --name CI --prefix "$RUNNER_TEMP/prefix" </dev/null
+      - name: Bootstrap script
+        run: sh -n packaging/install.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/

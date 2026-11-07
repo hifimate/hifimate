@@ -1,0 +1,25 @@
+[Unit]
+Description=HiFiMate audio arbitration
+Requires=hifimate-camilladsp.service
+Wants=hifimate-mpd.service hifimate-music-mpd.service
+After=hifimate-camilladsp.service hifimate-mpd.service hifimate-music-mpd.service pipewire.service pipewire-pulse.service
+
+[Service]
+Type=notify
+NotifyAccess=main
+TimeoutStartSec=20
+RuntimeDirectory=hifimate
+RuntimeDirectoryMode=0700
+RuntimeDirectoryPreserve=restart
+ExecStart=@PREFIX@/bin/hifimate-runner
+Restart=on-failure
+RestartSec=2
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%t/hifimate
+
+[Install]
+WantedBy=default.target

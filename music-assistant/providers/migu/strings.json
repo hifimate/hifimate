@@ -1,0 +1,66 @@
+{
+  "config_entries": {
+    "api_base_url": {
+      "label": "Migu API service",
+      "description": "Address of the local migu-api-enhanced service, including the /migu route prefix. Run it yourself; never sign in through a service you don't control."
+    },
+    "auth_method": {
+      "label": "Sign in",
+      "description": "Sign in with an SMS code for VIP songs, lossless/hi-res audio and your playlists, or continue without an account (free songs at standard quality only).",
+      "options": {
+        "sms": "Sign in with an SMS code",
+        "token": "Paste a pacmtoken",
+        "anonymous": "Continue without an account"
+      }
+    },
+    "phone": {
+      "label": "Phone number",
+      "description": "The mobile number of your Migu account. It is only passed to the Migu API service and not stored."
+    },
+    "sms_code": {
+      "label": "SMS code",
+      "description": "Leave empty and submit to request a new code."
+    },
+    "pacmtoken": {
+      "label": "pacmtoken",
+      "description": "Value of the pacmtoken cookie of a signed in music.migu.cn session."
+    },
+    "audio_quality": {
+      "label": "Preferred audio quality",
+      "description": "The best quality to request. When a song or your account does not offer it, the next lower one is used. Lossless and hi-res need a VIP account.",
+      "options": {
+        "hires": "Hi-Res (24-bit FLAC)",
+        "lossless": "Lossless (16-bit FLAC)",
+        "high": "High (320kbps MP3)",
+        "standard": "Standard (128kbps MP3)"
+      }
+    }
+  },
+  "setup_flow": {
+    "user": {
+      "title": "Connect Migu Music",
+      "description": "Enter the address of your migu-api-enhanced service and choose how to connect."
+    },
+    "phone": {
+      "title": "Sign in with SMS",
+      "description": "Enter your phone number to receive a login code. If Migu asks for an image captcha, sign in on music.migu.cn instead and use the pacmtoken option."
+    },
+    "sms_code": {
+      "title": "Enter the code",
+      "description": "Enter the code sent to {0}."
+    },
+    "token": {
+      "title": "Paste a pacmtoken",
+      "description": "Sign in on music.migu.cn in a browser, then copy the value of its pacmtoken cookie."
+    }
+  },
+  "media": {
+    "recommendations": {
+      "charts": { "name": "Migu charts" },
+      "daily": { "name": "Migu daily songs" }
+    }
+  },
+  "manifest": {
+    "description": "Stream the Migu Music (咪咕音乐) catalog through a local migu-api-enhanced service: search, albums, singers, playlists, charts and lyrics."
+  }
+}

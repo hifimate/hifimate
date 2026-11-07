@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+PREFIX=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+export PYTHONPATH="$PREFIX/lib${PYTHONPATH:+:$PYTHONPATH}"
+exec python3 -B -m hifimate.ctrl --prefix "$PREFIX" "$@"

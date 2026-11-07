@@ -1,0 +1,5 @@
+# Unified-diff context blank lines are represented by one marker space.
+native/upmpd/upmpdcli-hifi-gate.patch whitespace=-trailing
+
+# MPD unified-diff context preserves upstream tabs and marker-only blank lines.
+native/mpd/session.patch whitespace=-trailing,-space-before-tab

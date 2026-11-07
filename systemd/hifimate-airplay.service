@@ -1,0 +1,22 @@
+[Unit]
+Description=HiFiMate AirPlay receiver (Shairport Sync)
+Requires=pipewire-pulse.service
+# Shairport keeps hifimate.service's metadata FIFO open: follow explicit stop and
+# restart (PartOf) so it reopens a recreated FIFO, but never fail to start
+# because of it. Automatic restarts preserve the FIFO (RuntimeDirectoryPreserve).
+Wants=hifimate.service hifimate-airplay-net.service
+PartOf=hifimate.service
+After=pipewire.service pipewire-pulse.service hifimate.service
+[Service]
+Type=simple
+Environment=PULSE_SINK=airplay_in
+# Serve only on the default-route interface (see hifimate/airplay_net.py);
+# hifimate-airplay-net.service restarts this unit when that interface changes.
+RuntimeDirectory=hifimate-airplay
+RuntimeDirectoryMode=0700
+ExecStartPre=@PREFIX@/bin/hifimate-airplay-net render @PREFIX@/config/host-stack/shairport-sync.conf %t/hifimate-airplay/shairport-sync.conf
+ExecStart=@PREFIX@/bin/hifimate-rt @SHAIRPORT_SYNC@ -c %t/hifimate-airplay/shairport-sync.conf
+Restart=on-failure
+RestartSec=2
+[Install]
+WantedBy=default.target

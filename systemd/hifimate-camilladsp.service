@@ -1,0 +1,17 @@
+[Unit]
+Description=HiFiMate DSP (CamillaDSP)
+Requires=pipewire-pulse.service
+After=pipewire.service pipewire-pulse.service
+[Service]
+Type=simple
+RuntimeDirectory=hifimate-dsp
+RuntimeDirectoryMode=0700
+RuntimeDirectoryPreserve=restart
+# The capture stream forces its own graph group (selected lane + DSP) to the
+# configured capture_samplerate whenever it starts; other lanes keep their rate.
+Environment=PULSE_PROP=node.force-rate=0
+ExecStart=@PREFIX@/bin/hifimate-rt @CAMILLADSP@ -a 127.0.0.1 -p 1234 --wait --no_config --statefile %t/hifimate-dsp/state.yml
+Restart=on-failure
+RestartSec=3
+[Install]
+WantedBy=default.target

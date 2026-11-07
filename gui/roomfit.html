@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0a0c10">
+<title>HiFiMate 房间校正</title>
+<link rel="stylesheet" href="/ctrl/roomfit/roomfit.css">
+<script type="module" src="/ctrl/roomfit/roomfit.js"></script>
+</head>
+<body>
+<header><a class="brand" href="/ctrl/"><span class="logo"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M1 9V5M4 11V3M7 13V1M10 10V4M13 8V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>HiFiMate <small>房间校正</small></a>
+  <span class="spacer"></span><nav class="pages"><a href="/ctrl/">控制页</a><a href="/ctrl/eq/">我的 EQ</a><a href="/ctrl/roomfit/" class="on" aria-current="page">房间校正</a><a href="/ctrl/settings/">设置</a></nav></header>
+<main>
+  <section id="status" class="card" hidden></section>
+  <!-- Microphones need HTTPS: install the HiFiMate CA once -->
+  <section id="setup" class="card" hidden>
+    <h2>第一次使用：安装 HiFiMate 证书</h2>
+    <p class="sub">iPhone 只允许 HTTPS 网页使用麦克风。HiFiMate 用自己的证书提供 HTTPS，需要在 iPhone 上安装并信任一次。</p>
+    <ol class="steps">
+      <li><a class="button primary" href="/ctrl/roomfit/hifimate-ca.crt">下载 HiFiMate 证书</a><span class="sub">提示「此网站正尝试下载一个配置描述文件」时点「允许」。</span></li>
+      <li>打开「设置」→ 顶部的「已下载描述文件」→ 安装。</li>
+      <li>「设置」→「通用」→「关于本机」→ 最下面「证书信任设置」→ 打开「<span id="ca-name">HiFiMate Local CA</span>」。</li>
+      <li><a id="https-link" class="button" href="#">用 HTTPS 打开本页</a></li>
+    </ol>
+  </section>
+
+  <section id="login" class="card" hidden>
+    <h2>登录</h2>
+    <p class="sub">校正会用音箱播放扫频并修改均衡器，需要控制密码。</p>
+    <form id="login-form"><input id="password" type="password" autocomplete="current-password" placeholder="控制密码" required>
+      <button class="primary" type="submit">登录</button></form>
+    <p id="login-error" class="error"></p>
+  </section>
+
+  <section id="wizard" class="card" hidden>
+    <div id="stepper" class="stepper"></div>
+    <div id="view"></div>
+    <div id="progress" class="progress" hidden><div class="bar"><i></i></div><span id="progress-text"></span></div>
+    <p id="error" class="error"></p>
+  </section>
+</main>
+<dialog id="manage" class="sheet">
+  <div class="grab"></div>
+  <div class="sheet-head"><h2>房间校正方案 <small>保留最近 3 组</small></h2><button type="button" class="close" data-close aria-label="关闭">×</button></div>
+  <div id="manage-list"></div>
+  <p class="sub">「使用」立即切换到该方案；每做一次校正新增一组，最早的一组会被替换。</p>
+  <button type="button" id="new-correction" class="primary big">开始新的校正</button>
+</dialog>
+</body>
+</html>

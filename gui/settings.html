@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0a0c10">
+<title>HiFiMate 设置</title>
+<link rel="stylesheet" href="/ctrl/eq/eq.css">
+<script type="module" src="/ctrl/settings/settings.js"></script>
+</head>
+<body class="settings">
+<header><a class="brand" href="/ctrl/"><span class="logo"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M1 9V5M4 11V3M7 13V1M10 10V4M13 8V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>HiFiMate <small>设置</small></a>
+  <span class="spacer"></span><nav class="pages"><a href="/ctrl/">控制页</a><a href="/ctrl/eq/">我的 EQ</a><a href="/ctrl/roomfit/">房间校正</a><a href="/ctrl/settings/" class="on" aria-current="page">设置</a></nav></header>
+<main>
+  <section id="login" class="card" hidden>
+    <h2>登录后修改</h2>
+    <p class="sub">不登录可以查看；修改需要控制密码（主机上 hifimate 用户的密码）。</p>
+    <form id="login-form"><input id="password" type="password" autocomplete="current-password" placeholder="控制密码" required>
+      <button class="primary" type="submit">登录</button></form>
+    <p id="login-error" class="error"></p>
+  </section>
+
+  <section class="card" id="playback">
+    <div class="head"><h2>播放</h2></div>
+    <div class="field">
+      <label for="fade">开始播放时淡入</label>
+      <div class="control"><input id="fade" type="range" min="20" max="2000" step="10"><output id="fade-out"></output></div>
+      <p class="sub">从静音平滑升到正常音量，避免开始播放时的爆音。默认 <span id="fade-default"></span> 毫秒。</p>
+    </div>
+    <div class="field">
+      <label for="idle">没有声音多久后释放 DAC</label>
+      <div class="control"><select id="idle">
+        <option value="0">不释放</option><option value="60">1 分钟</option><option value="300">5 分钟</option>
+        <option value="900">15 分钟</option><option value="1800">30 分钟</option><option value="3600">1 小时</option></select></div>
+      <p class="sub">发送端暂停后，到时间就让它彻底暂停并关闭 DAC；再播放会自动重新打开。</p>
+    </div>
+    <div class="field">
+      <label>允许的采样率</label>
+      <div id="rates" class="chips"></div>
+      <p class="sub" id="rates-note">全部勾选表示 DAC 支持的采样率都可以用。取消勾选的采样率，播放这种曲目时会提示错误并保持静音，不会偷偷重采样。</p>
+    </div>
+    <p id="playback-error" class="error"></p>
+    <div class="actions"><span class="spacer"></span>
+      <button type="button" data-act="playback-default" class="need-login">恢复默认</button>
+      <button type="button" data-act="playback-save" class="primary need-login">保存</button></div>
+  </section>
+
+  <section class="card" id="subscriptions">
+    <div class="head"><h2>第三方音乐源订阅</h2></div>
+    <p class="warn-box">第三方音乐源不属于 HiFiMate，它们的代码会在 Music Assistant 里运行，能访问 Music Assistant 的全部数据。
+      添加前请确认来源可信，并自行确认使用它符合所在地法律和平台条款。</p>
+    <div id="sources"></div>
+    <form id="add-form" class="add"><input id="add-source" placeholder="owner/repo，或 GitHub / Gitee / GitCode 的仓库地址" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <button type="submit" class="need-login">添加</button></form>
+    <label class="check"><input type="checkbox" id="prune"> 从订阅中删除的仓库，同时删除它装的音乐源</label>
+    <p id="subs-error" class="error"></p>
+    <div class="actions"><span class="spacer"></span>
+      <button type="button" data-act="subs-save" class="primary need-login">保存并同步</button></div>
+    <p class="sub">保存后会同步这些仓库，再重启 Music Assistant 加载新的音乐源，大约 1 分钟，期间 Music Assistant 的播放会中断。
+      然后在 Music Assistant 的「设置 → Providers → Add」里添加。</p>
+  </section>
+
+  <section class="card" id="device">
+    <div class="head"><h2>设备</h2></div>
+    <dl id="device-info" class="info"></dl>
+    <p class="sub">下面这些在主机上用命令修改：</p>
+    <dl class="info cmds">
+      <dt>设备名称</dt><dd><code>sudo hifimate install --name 新名称</code></dd>
+      <dt>控制页和共享的密码</dt><dd><code>sudo hifimate password</code></dd>
+      <dt>Music Assistant 网页端口</dt><dd>编辑 <code>/opt/hifimate/music-assistant/.env</code>，见使用说明</dd>
+    </dl>
+  </section>
+</main>
+<dialog id="confirm-dialog" class="sheet">
+  <div class="sheet-head"><h2 id="confirm-title">确认</h2></div>
+  <p id="confirm-text" class="sub"></p>
+  <div class="actions"><span class="spacer"></span><button type="button" data-confirm="no">取消</button><button type="button" data-confirm="yes" class="primary">继续</button></div>
+</dialog>
+<div id="toast" class="toast" hidden></div>
+</body>
+</html>
