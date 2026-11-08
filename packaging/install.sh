@@ -55,7 +55,19 @@ if ! command -v pipx >/dev/null 2>&1; then
 fi
 
 say "installing $SPEC with pipx"
-pipx install --force "$SPEC" >&2
+# Right after a release some PyPI CDN edges (cached up to 10 minutes) do not list it
+# yet, and pip keeps its own copy of that list: try again, past pip's cache, for ~5 min.
+attempt=1
+until pipx install --force "$SPEC" >&2; do
+    if [ -z "$VERSION" ] || [ "$attempt" -ge "${HIFIMATE_PIPX_TRIES:-10}" ]; then
+        say "could not install $SPEC; run this again in a few minutes"
+        exit 1
+    fi
+    say "PyPI may not list hifimate $VERSION everywhere yet; trying again in ${HIFIMATE_RETRY_DELAY:-30} s"
+    sleep "${HIFIMATE_RETRY_DELAY:-30}"
+    export PIP_NO_CACHE_DIR=1
+    attempt=$((attempt + 1))
+done
 bin=$(pipx environment --value PIPX_BIN_DIR 2>/dev/null || printf '%s' "${PIPX_BIN_DIR:-$HOME/.local/bin}")
 if [ -z "$SUDO" ]; then :; else
     case ":$PATH:" in *":$bin:"*) ;; *) pipx ensurepath >/dev/null 2>&1 || true

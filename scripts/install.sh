@@ -528,10 +528,21 @@ if [ "$ENABLE" -eq 1 ]; then
         hifimate-dlna.service hifimate-spectrum.service hifimate-ctrl.service hifimate-bluetooth.service
 fi
 
+# A network step that a brief DNS or registry hiccup can fail: try it again a little later.
+retry() {
+    tries=${HIFIMATE_NET_TRIES:-3} attempt=1
+    until "$@"; do
+        [ "$attempt" -lt "$tries" ] || return 1
+        echo "network step failed; trying again in ${HIFIMATE_RETRY_DELAY:-20} s ($attempt/$((tries - 1)))" >&2
+        sleep "${HIFIMATE_RETRY_DELAY:-20}"
+        attempt=$((attempt + 1))
+    done
+}
+
 if [ "$WITH_MUSIC_ASSISTANT" -eq 1 ] && [ "$APPLY" -eq 1 ]; then
     docker compose --project-directory "$ma_dir" --env-file "$ma_env" -f "$ma_dir/compose.yml" config --quiet
     # migu-api has no published image; `up` builds it from its pinned source
-    docker compose --project-directory "$ma_dir" --env-file "$ma_env" -f "$ma_dir/compose.yml" pull --ignore-buildable
+    retry docker compose --project-directory "$ma_dir" --env-file "$ma_env" -f "$ma_dir/compose.yml" pull --ignore-buildable
     # The stock MA server owns settings.json while it is running. Stop only
     # that service while seeding the MilkDrop plugin and HiFi player settings
     # (configure_ma_players.py), then start it again. HiFi's players get random

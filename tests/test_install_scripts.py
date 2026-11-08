@@ -160,6 +160,7 @@ def test_enable_scoped_audio_fragments_are_restored(enabled_install):
 
 
 def fake_docker(tmp_path, monkeypatch):
+    monkeypatch.setenv("HIFIMATE_RETRY_DELAY", "0")
     fake_bin = tmp_path / "fake-bin"
     fake_bin.mkdir()
     log = tmp_path / "docker.log"
@@ -169,7 +170,9 @@ def fake_docker(tmp_path, monkeypatch):
         'printf "%s\\n" "$*" >> "$DOCKER_TEST_LOG"\n'
         'case " $* " in\n'
         '  *" down "*) exit "${DOCKER_DOWN_STATUS:-0}" ;;\n'
-        '  *" pull "*) exit "${DOCKER_PULL_STATUS:-0}" ;;\n'
+        '  *" pull "*) if [ -n "${DOCKER_PULL_FAILS:-}" ] && [ "$(cat "$DOCKER_PULL_FAILS")" -gt 0 ]; then\n'
+        '      echo $(( $(cat "$DOCKER_PULL_FAILS") - 1 )) > "$DOCKER_PULL_FAILS"; exit 1; fi\n'
+        '    exit "${DOCKER_PULL_STATUS:-0}" ;;\n'
         '  *" up "*) exit "${DOCKER_UP_STATUS:-0}" ;;\n'
         'esac\nexit 0\n'
     )
@@ -546,3 +549,16 @@ def test_an_install_interrupted_after_recording_its_version_resumes(tmp_path):
     (prefix / "share/hifimate/commit").write_text("edited\n")
     refused = run(INSTALL, prefix, "--apply")
     assert refused.returncode != 0 and "owned file modified or missing: share/hifimate/commit" in refused.stderr
+
+
+def test_a_brief_network_failure_while_pulling_images_is_retried(tmp_path, monkeypatch):
+    log = fake_docker(tmp_path, monkeypatch)
+    fails = tmp_path / "pull-fails"
+    fails.write_text("1\n")                                   # e.g. a DNS timeout, then fine
+    monkeypatch.setenv("DOCKER_PULL_FAILS", str(fails))
+    prefix = tmp_path / "prefix"
+    result = run(INSTALL, prefix, "--apply", "--with-music-assistant",
+                 "--music-assistant-data-dir", str(tmp_path / "data"), "--music-directory", str(tmp_path / "music"))
+    assert result.returncode == 0, result.stderr
+    assert sum(" pull " in f" {line} " for line in log.read_text().splitlines()) == 2
+    assert "trying again" in result.stderr

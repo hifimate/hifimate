@@ -217,6 +217,29 @@ def test_bootstrap_as_root_installs_for_the_whole_system(tmp_path):
     assert lines[-1] == 'hifimate install --non-interactive --name Den'     # no terminal: unattended
 
 
+def test_bootstrap_waits_for_a_release_pypi_does_not_list_everywhere_yet(tmp_path):
+    env, log = bootstrap_env(tmp_path, 0)
+    fails = tmp_path / 'fails'
+    fails.write_text('2\n')
+    (tmp_path / 'bin' / 'pipx').write_text(
+        f'#!/bin/sh\necho "pipx $* NOCACHE=${{PIP_NO_CACHE_DIR:-}}" >> {log}\n'
+        f'[ "$1" = environment ] && echo {tmp_path / "bin"} && exit 0\n'
+        f'n=$(cat {fails}); if [ "$n" -gt 0 ]; then echo $((n - 1)) > {fails}; exit 1; fi\nexit 0\n')
+    release = tmp_path / 'install.sh'
+    release.write_text((ROOT / 'packaging/install.sh').read_text().replace('@VERSION@', '0.1.0', 1))
+    result = subprocess.run(['sh', str(release)], env={**env, 'HIFIMATE_RETRY_DELAY': '0'}, stdin=subprocess.DEVNULL,
+                            capture_output=True, text=True, start_new_session=True)
+    assert result.returncode == 0, result.stderr
+    installs = [line for line in log.read_text().splitlines() if line.startswith('pipx install')]
+    assert len(installs) == 3 and installs[0].endswith('NOCACHE=') and installs[-1].endswith('NOCACHE=1')
+    assert 'trying again' in result.stderr
+    # Unpinned (a checkout's script): a failure is not a release still on its way, no waiting.
+    fails.write_text('1\n')
+    result = subprocess.run(['sh', str(ROOT / 'packaging/install.sh')], env={**env, 'HIFIMATE_RETRY_DELAY': '0'},
+                            stdin=subprocess.DEVNULL, capture_output=True, text=True, start_new_session=True)
+    assert result.returncode == 1 and 'run this again in a few minutes' in result.stderr
+
+
 def test_bootstrap_without_root_points_to_sudo(tmp_path):
     env, log = bootstrap_env(tmp_path, 1000)
     result = subprocess.run(['sh', str(ROOT / 'packaging/install.sh')], env=env, stdin=subprocess.DEVNULL,
