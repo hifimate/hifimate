@@ -289,6 +289,11 @@ def install(args, rest, run=subprocess.call):
     return status
 
 
+# The install scripts run as the service user, who usually cannot enter the
+# directory sudo was started from (a 0700 home): find(1) then fails mid-install.
+SERVICE_CWD = '/'
+
+
 def dry_run_hint(action):
     """The scripts' environment: their dry-run hint names this command's way to apply
     (leave out --dry-run), not their own --apply."""
@@ -364,7 +369,7 @@ def system_install(args, rest, run=subprocess.call, sysrun=subprocess.run, sys_=
                    '--apply', '--enable']
         if args.music_assistant:
             command.append('--with-music-assistant')
-        status = run(sys_.as_user(command, user_id), env=env)
+        status = run(sys_.as_user(command, user_id), env=env, cwd=SERVICE_CWD)
     if status:
         return status
     if args.share:
@@ -428,7 +433,8 @@ def uninstall(args, rest, run=subprocess.call, sysrun=subprocess.run, sys_=syste
             raise SystemExit('hifimate: 没有找到用户 hifimate，系统安装不存在')
         with Tree(owner=sys_.USER) as root:
             command = ['sh', str(root / 'scripts/uninstall.sh'), '--prefix', str(sys_.PREFIX)]
-            status = run(sys_.as_user(command + ([] if args.dry_run else ['--apply']), user_id), env=dry_run_hint('卸载'))
+            status = run(sys_.as_user(command + ([] if args.dry_run else ['--apply']), user_id), env=dry_run_hint('卸载'),
+                         cwd=SERVICE_CWD)
             if status or args.dry_run:
                 return status
             for script in ('realtime_permissions.py', 'bluetooth_speaker.py'):

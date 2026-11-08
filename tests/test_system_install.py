@@ -142,12 +142,14 @@ def parse(argv):
 def test_root_install_creates_the_user_then_installs_as_it(root, monkeypatch, tmp_path):
     monkeypatch.setenv('HIFIMATE_CTRL_PASSWORD', 'correct horse')
     calls = []
-    def run(argv, env=None):
-        calls.append((argv, env))
+    cwds = []
+    def run(argv, env=None, cwd=None):
+        calls.append((argv, env)); cwds.append(cwd)
         return 0
     args, rest = parse(['install', '--name', '客厅', '--setup-realtime'])
     assert cli.system_install(args, rest, run, sys_=root) == 0
     deps, install = calls
+    assert cwds[1] == '/'      # as the service user, from a directory it can enter (not sudo's 0700 home)
     assert deps[0][3:6] == ['--install-deps', '--apply', '--yes'] and '--with-share' in deps[0]
     argv, env = install
     assert argv[:2] == ['AS', '991'] and argv[3].endswith('scripts/install.sh')
@@ -178,7 +180,7 @@ def test_root_install_reads_password_files_itself(root, tmp_path):
     secret.chmod(0o600)
     calls = []
     args, rest = parse(['install', '--ctrl-password-file', str(secret), '--without-share', '--without-music-assistant'])
-    cli.system_install(args, rest, lambda argv, env=None: calls.append((argv, env)) or 0, sys_=root)
+    cli.system_install(args, rest, lambda argv, env=None, cwd=None: calls.append((argv, env)) or 0, sys_=root)
     argv, env = calls[-1]
     assert '--ctrl-password-file' not in argv and 'HIFIMATE_CTRL_PASSWORD' not in env
     assert ('password', 'from a file') in root.log

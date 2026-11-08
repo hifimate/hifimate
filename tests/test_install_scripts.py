@@ -528,3 +528,21 @@ def test_reinstall_after_uninstall_keeps_the_users_data(tmp_path, monkeypatch):
     (prefix / "bin").mkdir(exist_ok=True)
     (prefix / "bin/leftover").write_text("x")
     assert run(INSTALL, prefix, "--apply", "--yes").returncode != 0
+
+
+def test_an_install_interrupted_after_recording_its_version_resumes(tmp_path):
+    # install.sh writes share/hifimate/{commit,version} after its journal; a run that
+    # stops there (e.g. at the Music Assistant providers) must not block the retry.
+    prefix = tmp_path / "prefix"
+    assert run(INSTALL, prefix, "--apply").returncode == 0
+    for name in ("share/hifimate/commit", "share/hifimate/version"):
+        (prefix / name).write_text("from the interrupted run\n")
+    (prefix / ".hifimate-install-in-progress").write_text("hifimate-install-in-progress-v1\n")
+    resumed = run(INSTALL, prefix, "--apply")
+    assert resumed.returncode == 0, resumed.stderr
+    assert not (prefix / ".hifimate-install-in-progress").exists()
+    assert (prefix / "share/hifimate/version").read_text() != "from the interrupted run\n"
+    # Without an interrupted run, a changed record is still somebody's edit: refused.
+    (prefix / "share/hifimate/commit").write_text("edited\n")
+    refused = run(INSTALL, prefix, "--apply")
+    assert refused.returncode != 0 and "owned file modified or missing: share/hifimate/commit" in refused.stderr

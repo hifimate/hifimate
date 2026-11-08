@@ -50,6 +50,8 @@ DYNAMIC_PREFIXES = (
     # Room measurements (roomfit.py).
     'state/roomfit',
 )
+# Written by install.sh after the journal, outside TREES: a resumed install rewrites them too.
+INSTALLER_FILES = {'share/hifimate/commit', 'share/hifimate/version'}
 METADATA = {MARKER, MARKER + '.sha256', USER, USER + '.sha256', JOURNAL,
             '.hifimate-output.lock'}
 
@@ -184,7 +186,8 @@ def preflight(prefix, config, uninstall=False):
     # managed trees; a retry rewrites them all, so it may resume over them.
     resuming = journal.exists() and not uninstall
     def installer_tree(name):
-        return any(name.startswith(tree + '/') for tree in TREES) or name.startswith('config/')
+        return (any(name.startswith(tree + '/') for tree in TREES) or name.startswith('config/')
+                or name in INSTALLER_FILES)
     for name, sha in owned.items():
         path = prefix / name
         safe(path)
