@@ -19,6 +19,8 @@ is stored anywhere), and makes a GitHub release with `install.sh`, the one-line 
 3. `git tag vX.Y.Z && git push origin vX.Y.Z`. The workflow refuses a tag that does not match `__version__`.
 
 The installer is then at `https://github.com/hifimate/hifimate/releases/latest/download/install.sh` (run with `| sudo sh`).
+The GitHub release (and so that link) is made only once pip itself can install the new version from PyPI,
+whose simple index lags an upload by a few minutes.
 
 ## Locally
 

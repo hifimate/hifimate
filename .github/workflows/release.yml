@@ -89,6 +89,19 @@ jobs:
         with:
           name: release
           path: dist/
+      # The release is what the one-line installer follows (releases/latest), and pip
+      # reads PyPI's simple index, which lags the upload by up to a few minutes:
+      # publish the installer only once pip itself can install this version.
+      - name: Wait until pip can install the release
+        run: |
+          version=${{ needs.build.outputs.version }}
+          for attempt in $(seq 1 60); do
+            if python3 -m pip download --quiet --no-deps --no-cache-dir --dest "$RUNNER_TEMP/check" "hifimate==$version"; then
+              echo "pip sees hifimate $version"; exit 0
+            fi
+            sleep 15
+          done
+          echo "hifimate $version is still not installable from PyPI after 15 minutes" >&2; exit 1
       - name: GitHub release with the installer
         env:
           GH_TOKEN: ${{ github.token }}
