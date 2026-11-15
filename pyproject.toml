@@ -1,16 +1,15 @@
 [build-system]
-requires = ['hatchling>=1.26']
+requires = ['hatchling>=1.26', 'hatch-fancy-pypi-readme>=24']
 build-backend = 'hatchling.build'
 
 [project]
 name = 'hifimate'
-dynamic = ['version']
+dynamic = ['version', 'readme']
 description = 'HiFiMate: a Linux hi-fi audio receiver (AirPlay, DLNA, Bluetooth, Music Assistant) at the native sample rate'
 requires-python = '>=3.10'
 license = 'MIT'
 license-files = ['LICENSE', 'NOTICE.md']
 dependencies = []   # the installer needs nothing; the receiver uses distribution packages (host_stack.py)
-readme = 'README.md'
 keywords = ['audio', 'hifi', 'airplay', 'dlna', 'bluetooth', 'pipewire', 'camilladsp', 'music-assistant']
 classifiers = [
     'Environment :: No Input/Output (Daemon)',
@@ -38,6 +37,23 @@ pythonpath = ['.']
 
 [tool.hatch.version]
 path = 'hifimate/__init__.py'
+
+# PyPI shows README.md without the repository around it: its relative links
+# (README.en.md, INSTALL.md, ...) point into the repository on GitHub there.
+[tool.hatch.metadata.hooks.fancy-pypi-readme]
+content-type = 'text/markdown'
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+path = 'README.md'
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = '\]\((?!https?://|#|/)([^)]+)\)'
+replacement = '](https://github.com/hifimate/hifimate/blob/main/\1)'
+
+# PyPI gives headings no ids: the README's own anchors go to the README on GitHub too.
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = '\]\(#'
+replacement = '](https://github.com/hifimate/hifimate/blob/main/README.md#'
 
 # The wheel carries the whole installable tree: the hifimate package plus,
 # under hifimate/_dist, everything scripts/install.sh copies into a prefix.

@@ -187,7 +187,7 @@ def test_the_wheel_check_requires_the_built_commit(tmp_path):
 
 def test_version_is_one_number_everywhere():
     config = tomllib.loads((ROOT / 'pyproject.toml').read_text())
-    assert config['project']['dynamic'] == ['version'] and config['tool']['hatch']['version']['path'] == 'hifimate/__init__.py'
+    assert 'version' in config['project']['dynamic'] and 'version' not in config['project'] and config['tool']['hatch']['version']['path'] == 'hifimate/__init__.py'
     assert re.fullmatch(r'\d+\.\d+\.\d+', __version__)
 
 
@@ -267,3 +267,16 @@ def test_a_checkout_is_staged_with_what_a_release_carries():
     shipped = {name for name in config['tool']['hatch']['build']['targets']['wheel']['force-include']} | {'hifimate'}
     assert shipped <= set(cli.CHECKOUT_TREE)
     assert not {'.pytest_cache', 'tests', '.git', '.venv'} & set(cli.CHECKOUT_TREE)
+
+
+def test_the_pypi_readme_links_into_the_repository():
+    """PyPI shows README.md on its own: every relative link and anchor must reach GitHub instead."""
+    import re
+    hook = tomllib.loads((ROOT / 'pyproject.toml').read_text())['tool']['hatch']['metadata']['hooks']['fancy-pypi-readme']
+    text = ''.join((ROOT / f['path']).read_text() for f in hook['fragments'])
+    for sub in hook['substitutions']:
+        text = re.sub(sub['pattern'], sub['replacement'], text)
+    targets = re.findall(r'\]\(([^)]+)\)', text) + re.findall(r'src="([^"]+)"', text)
+    assert targets and all(t.startswith('https://') for t in targets), [t for t in targets if not t.startswith('https://')]
+    assert '](https://github.com/hifimate/hifimate/blob/main/README.en.md)' in text
+    assert '](https://github.com/hifimate/hifimate/blob/main/README.md#往音乐库里放歌)' in text
