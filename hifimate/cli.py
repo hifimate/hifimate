@@ -48,7 +48,8 @@ NOT_REMEMBERED = {'--ctrl-password-file', '--ma-admin-user', '--ma-admin-passwor
 REPEATABLE = {'--without-ma-provider'}
 # What scripts/install.sh reads from a checkout (the same as the wheel's _dist plus the package).
 CHECKOUT_TREE = ('hifimate', 'scripts', 'bin', 'config', 'systemd', 'gui', 'music-assistant', 'docs',
-                 'README.md', 'INSTALL.md', 'LICENSE', 'NOTICE.md', 'pyproject.toml')
+                 'README.md', 'INSTALL.md', 'LICENSE', 'NOTICE.md', 'README.en.md', 'INSTALL.en.md', 'NOTICE.en.md',
+                 'pyproject.toml')
 # The system install does these itself (as root), so install.sh never needs sudo.
 SYSTEM_DROPS = {'--setup-realtime', '--setup-bluetooth-speaker'}
 

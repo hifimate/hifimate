@@ -60,6 +60,9 @@ artifacts = ['hifimate/_commit.txt']
 'INSTALL.md' = 'hifimate/_dist/INSTALL.md'
 'LICENSE' = 'hifimate/_dist/LICENSE'
 'NOTICE.md' = 'hifimate/_dist/NOTICE.md'
+'README.en.md' = 'hifimate/_dist/README.en.md'
+'INSTALL.en.md' = 'hifimate/_dist/INSTALL.en.md'
+'NOTICE.en.md' = 'hifimate/_dist/NOTICE.en.md'
 
 [tool.hatch.build.targets.sdist]
 # python -m build makes the wheel from the sdist, so the git-ignored commit file must be in both.

@@ -1,3 +1,5 @@
+**中文** | [English](SPECTRUM.en.md)
+
 # 频谱
 
 控制页和 Music Assistant 浮窗里的频谱怎样得到、怎样分析和显示。总体架构见 [ARCHITECTURE.md](ARCHITECTURE.md)。

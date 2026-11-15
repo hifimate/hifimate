@@ -1,3 +1,5 @@
+**中文** | [English](NOTICE.en.md)
+
 # 第三方说明 / Third-party notices
 
 HiFiMate 自身的代码按 MIT 许可证发布（见 `LICENSE`）。仓库里不包含其他项目的源码或二进制；

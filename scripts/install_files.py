@@ -233,7 +233,8 @@ def check_targets(prefix, source):
                 names.add(name)
                 if directory == 'config/host-stack':
                     names.add(name + '.tmp')
-    names.update('share/doc/hifimate/' + name for name in ('README.md', 'INSTALL.md', 'NOTICE.md', 'ARCHITECTURE.md', 'SPECTRUM.md'))
+    names.update('share/doc/hifimate/' + name for name in ('README.md', 'INSTALL.md', 'NOTICE.md', 'ARCHITECTURE.md', 'SPECTRUM.md',
+                                                           'README.en.md', 'INSTALL.en.md', 'NOTICE.en.md', 'ARCHITECTURE.en.md', 'SPECTRUM.en.md'))
     for name in names:
         path = prefix / name
         safe(path)

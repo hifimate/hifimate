@@ -176,6 +176,7 @@ run() {
     fi
 }
 for required in hifimate/core.py hifimate/daemon.py README.md INSTALL.md NOTICE.md docs/ARCHITECTURE.md docs/SPECTRUM.md \
+    README.en.md INSTALL.en.md NOTICE.en.md docs/ARCHITECTURE.en.md docs/SPECTRUM.en.md \
     config/hifimate.conf config/host-stack-manifest.json scripts/host_stack.py \
     scripts/camilladsp_release.py hifimate/spectrum.py hifimate/spectrum_proxy.py hifimate/dsp_model.py \
     bin/hifimate-spectrum systemd/hifimate-spectrum.service config/host-stack/spectrum.json \
@@ -191,7 +192,7 @@ for required in hifimate/core.py hifimate/daemon.py README.md INSTALL.md NOTICE.
     music-assistant/providers/bilibili/__init__.py music-assistant/providers/bilibili/manifest.json \
     music-assistant/providers/migu/__init__.py music-assistant/providers/migu/manifest.json \
     music-assistant/nginx.conf music-assistant/nginx-entrypoint.sh music-assistant/hifimate_ctrl_token.py \
-    music-assistant/.env.example music-assistant/README.md; do
+    music-assistant/.env.example music-assistant/README.md music-assistant/README.en.md; do
     [ -f "$ROOT/$required" ] || { echo "missing repository file: $required" >&2; exit 1; }
 done
 
@@ -299,7 +300,7 @@ run mkdir -p "$PREFIX/music-assistant"
 # installed copy so a changed config restarts web below instead of being ignored.
 web_config() { cat "$PREFIX/music-assistant/nginx.conf" "$PREFIX/music-assistant/nginx-entrypoint.sh" 2>/dev/null | sha256sum; }
 web_before=$(web_config)
-run cp "$ROOT/music-assistant/compose.yml" "$ROOT/music-assistant/custom-loader-run.sh" "$ROOT/music-assistant/nginx.conf" "$ROOT/music-assistant/nginx-entrypoint.sh" "$ROOT/music-assistant/hifimate_ctrl_token.py" "$ROOT/music-assistant/.env.example" "$ROOT/music-assistant/README.md" "$PREFIX/music-assistant/"
+run cp "$ROOT/music-assistant/compose.yml" "$ROOT/music-assistant/custom-loader-run.sh" "$ROOT/music-assistant/nginx.conf" "$ROOT/music-assistant/nginx-entrypoint.sh" "$ROOT/music-assistant/hifimate_ctrl_token.py" "$ROOT/music-assistant/.env.example" "$ROOT/music-assistant/README.md" "$ROOT/music-assistant/README.en.md" "$PREFIX/music-assistant/"
 run chmod 0755 "$PREFIX/music-assistant/custom-loader-run.sh"
 run chmod 0755 "$PREFIX/music-assistant/nginx-entrypoint.sh"
 run mkdir -p "$PREFIX/share/hifimate/camilladsp"
@@ -469,7 +470,8 @@ JSON
 fi
 # The documents change between releases; the old set was checked by preflight.
 run find "$PREFIX/share/doc/hifimate" -maxdepth 1 -type f -name '*.md' -delete
-run cp "$ROOT/README.md" "$ROOT/INSTALL.md" "$ROOT/NOTICE.md" "$ROOT/docs/ARCHITECTURE.md" "$ROOT/docs/SPECTRUM.md" "$PREFIX/share/doc/hifimate/"
+run cp "$ROOT/README.md" "$ROOT/INSTALL.md" "$ROOT/NOTICE.md" "$ROOT/docs/ARCHITECTURE.md" "$ROOT/docs/SPECTRUM.md" \
+    "$ROOT/README.en.md" "$ROOT/INSTALL.en.md" "$ROOT/NOTICE.en.md" "$ROOT/docs/ARCHITECTURE.en.md" "$ROOT/docs/SPECTRUM.en.md" "$PREFIX/share/doc/hifimate/"
 
 if [ "$APPLY" -eq 1 ]; then
     if [ "$SETUP_REALTIME" -eq 1 ]; then printf "%s\n" "managed realtime permission" > "$PREFIX/config/realtime-permissions.request"; fi

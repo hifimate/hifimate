@@ -1,3 +1,5 @@
+**中文** | [English](README.en.md)
+
 # Music Assistant 使用说明
 
 [Music Assistant](https://www.music-assistant.io/)（下文简称 MA）管理本地曲库和流媒体音乐源，用网页或手机播放、排队。

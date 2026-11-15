@@ -15,7 +15,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ('scripts/', 'bin/', 'config/', 'systemd/', 'gui/', 'music-assistant/', 'docs/')
-DOCS = ('README.md', 'INSTALL.md', 'LICENSE', 'NOTICE.md')
+DOCS = ('README.md', 'INSTALL.md', 'LICENSE', 'NOTICE.md', 'README.en.md', 'INSTALL.en.md', 'NOTICE.en.md')
 FORBIDDEN = ('tests/', 'music-assistant/data/', '__pycache__')
 
 

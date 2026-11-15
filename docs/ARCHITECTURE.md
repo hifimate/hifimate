@@ -1,3 +1,5 @@
+**中文** | [English](ARCHITECTURE.en.md)
+
 # 架构与实现
 
 本文说明 HiFiMate 的工作原理和实现细节，面向想了解内部机制或参与开发的读者。使用方法见 [README](../README.md)，
